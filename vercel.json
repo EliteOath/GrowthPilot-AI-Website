@@ -1,17 +1,17 @@
 {
-"buildCommand": "pnpm build",
-"installCommand": "pnpm install",
-"env": {
-"NODE_ENV": "production"
-},
-"rewrites": [
-{
-"source": "/api/(.*)",
-"destination": "/dist/index.js"
-},
-{
-"source": "/(.*)",
-"destination": "/dist/public/$1"
-}
-]
+    "buildCommand": "pnpm build",
+    "installCommand": "pnpm install",
+    "env": {
+        "NODE_ENV": "production"
+    },
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/dist/index.js"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/dist/public/$1"
+        }
+    ]
 }
