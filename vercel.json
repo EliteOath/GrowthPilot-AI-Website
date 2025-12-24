@@ -1,0 +1,22 @@
+{
+"buildCommand": "pnpm build",
+"installCommand": "pnpm install",
+"env": {
+"NODE_ENV": "production"
+},
+"functions": {
+"server/_core/index.ts": {
+"runtime": "nodejs18.x"
+}
+},
+"rewrites": [
+{
+"source": "/api/(.* )",
+"destination": "/dist/index.js"
+},
+{
+"source": "/(.*)",
+"destination": "/dist/public/$1"
+}
+]
+}
