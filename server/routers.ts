@@ -15,8 +15,8 @@ export const appRouter = router({
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
-      const cookieOptions = getSessionCookieOptions(ctx.req);
-      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      const cookieOptions = getSessionCookieOptions(ctx.req as any);
+      (ctx.res as any).clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
       return {
         success: true,
       } as const;
@@ -30,7 +30,9 @@ export const appRouter = router({
     payInvoice: protectedProcedure
       .input(z.object({ invoiceId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const origin = (ctx.req.headers.origin as string) || "http://localhost:3000";
+        const originHeader = (ctx.req as any).headers?.origin as string | undefined;
+        const origin = originHeader || "http://localhost:3000";
+
         const checkoutUrl = await createInvoicePaymentSession(
           input.invoiceId,
           ctx.user.id,

@@ -1,16 +1,15 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
-import type { Express, Request, Response } from "express";
+import type { Express } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 
-
-function getQueryParam(req: Request, key: string): string | undefined {
-  const value = req.query[key];
+function getQueryParam(req: any, key: string): string | undefined {
+  const value = req.query?.[key];
   return typeof value === "string" ? value : undefined;
 }
 
 export function registerOAuthRoutes(app: Express) {
-  app.get("/api/oauth/google/callback", async (req: Request, res: Response) => {
+  app.get("/api/oauth/google/callback", async (req: any, res: any) => {
     const code = getQueryParam(req, "code");
 
     if (!code) {
@@ -19,63 +18,63 @@ export function registerOAuthRoutes(app: Express) {
     }
 
     try {
-      // 1. Exchange code for tokens 
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", { 
-        method: "POST", 
+      // 1. Exchange code for tokens
+      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ 
-          code, 
-          client_id: process.env.GOOGLE_CLIENT_ID!, 
-          client_secret: process.env.GOOGLE_CLIENT_SECRET!, 
-          redirect_uri: process.env.OAUTH_REDIRECT_URL!, 
-          grant_type: "authorization_code", 
-        }), 
-      }); 
+        body: new URLSearchParams({
+          code,
+          client_id: process.env.GOOGLE_CLIENT_ID!,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+          redirect_uri: process.env.OAUTH_REDIRECT_URL!,
+          grant_type: "authorization_code",
+        }),
+      });
 
-      const tokenJson = await tokenRes.json(); 
+      const tokenJson = await tokenRes.json();
 
-      if (!tokenJson.access_token) { 
-        console.error("Google token exchange failed:", tokenJson); 
-        res.status(500).json({ error: "Failed to exchange code for token" }); 
-        return; 
-      } 
+      if (!tokenJson.access_token) {
+        console.error("Google token exchange failed:", tokenJson);
+        res.status(500).json({ error: "Failed to exchange code for token" });
+        return;
+      }
 
-      // 2. Fetch user info 
-      const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { 
-        headers: { Authorization: `Bearer ${tokenJson.access_token}` }, 
-      }); 
+      // 2. Fetch user info
+      const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${tokenJson.access_token}` },
+      });
 
-      const userInfo = await userRes.json(); 
-      
-      if (!userInfo.sub) { 
-        res.status(400).json({ error: "Missing Google user ID (sub)" }); 
-        return; 
-      } 
+      const userInfo = await userRes.json();
 
-      // 3. Upsert user in DB 
-      await db.upsertUser({ 
-        openId: userInfo.sub, 
-        name: userInfo.name || null, 
-        email: userInfo.email ?? null, 
-        loginMethod: "google", 
-        lastSignedIn: new Date(), 
-      }); 
+      if (!userInfo.sub) {
+        res.status(400).json({ error: "Missing Google user ID (sub)" });
+        return;
+      }
 
-      // 4. Create session token (your existing logic) 
-      const sessionToken = await db.createSessionToken(userInfo.sub, { 
-        name: userInfo.name || "", 
-        expiresInMs: ONE_YEAR_MS, 
-      }); 
-      
-      // 5. Set cookie 
-      const cookieOptions = getSessionCookieOptions(req); 
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS }); 
-      
-      // 6. Redirect to homepage 
-      res.redirect(302, "/"); 
-    } catch (error) { 
-      console.error("[OAuth] Google callback failed", error); 
+      // 3. Upsert user in DB
+      await db.upsertUser({
+        openId: userInfo.sub,
+        name: userInfo.name || null,
+        email: userInfo.email ?? null,
+        loginMethod: "google",
+        lastSignedIn: new Date(),
+      });
+
+      // 4. Create session token
+      const sessionToken = db.createSessionToken(userInfo.sub, {
+        name: userInfo.name || "",
+        expiresInMs: ONE_YEAR_MS,
+      });
+
+      // 5. Set cookie
+      const cookieOptions = getSessionCookieOptions(req);
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+      // 6. Redirect to homepage
+      res.redirect(302, "/");
+    } catch (error) {
+      console.error("[OAuth] Google callback failed", error);
       res.status(500).json({ error: "OAuth callback failed" });
-    } 
-  }); 
+    }
+  });
 }

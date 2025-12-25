@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type Request, type Response } from "express";
 import Stripe from "stripe";
 import { handleWebhookEvent } from "../stripe";
 import { notifyInvoicePayment } from "../notifications";
@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-12-15.clover",
 });
 
-router.post("/api/stripe/webhook", async (req, res) => {
+router.post("/api/stripe/webhook", async (req: Request, res: Response) => {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
