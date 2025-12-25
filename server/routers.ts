@@ -111,7 +111,7 @@ export const appRouter = router({
           metaTitle: z.string().optional(),
           metaDescription: z.string().optional(),
           metaKeywords: z.string().optional(),
-          isPublished: z.number().optional(),
+          isPublished: z.boolean().optional(),
           publishedAt: z.date().optional(),
           readTime: z.number().optional(),
         })
@@ -135,7 +135,7 @@ export const appRouter = router({
           metaTitle: z.string().optional(),
           metaDescription: z.string().optional(),
           metaKeywords: z.string().optional(),
-          isPublished: z.number().optional(),
+          isPublished: z.boolean().optional(),
           publishedAt: z.date().optional(),
           readTime: z.number().optional(),
         })
