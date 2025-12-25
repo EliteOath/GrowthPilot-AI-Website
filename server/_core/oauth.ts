@@ -2,7 +2,7 @@ import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
-import { sdk } from "./sdk";
+
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -10,44 +10,72 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
-  app.get("/api/oauth/callback", async (req: Request, res: Response) => {
+  app.get("/api/oauth/google/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
-    const state = getQueryParam(req, "state");
 
-    if (!code || !state) {
-      res.status(400).json({ error: "code and state are required" });
+    if (!code) {
+      res.status(400).json({ error: "Missing ?code=" });
       return;
     }
 
     try {
-      const tokenResponse = await sdk.exchangeCodeForToken(code, state);
-      const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
+      // 1. Exchange code for tokens 
+      const tokenRes = await fetch("https://oauth2.googleapis.com/token", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ 
+          code, 
+          client_id: process.env.GOOGLE_CLIENT_ID!, 
+          client_secret: process.env.GOOGLE_CLIENT_SECRET!, 
+          redirect_uri: process.env.OAUTH_REDIRECT_URL!, 
+          grant_type: "authorization_code", 
+        }), 
+      }); 
 
-      if (!userInfo.openId) {
-        res.status(400).json({ error: "openId missing from user info" });
-        return;
-      }
+      const tokenJson = await tokenRes.json(); 
 
-      await db.upsertUser({
-        openId: userInfo.openId,
-        name: userInfo.name || null,
-        email: userInfo.email ?? null,
-        loginMethod: userInfo.loginMethod ?? userInfo.platform ?? null,
-        lastSignedIn: new Date(),
-      });
+      if (!tokenJson.access_token) { 
+        console.error("Google token exchange failed:", tokenJson); 
+        res.status(500).json({ error: "Failed to exchange code for token" }); 
+        return; 
+      } 
 
-      const sessionToken = await sdk.createSessionToken(userInfo.openId, {
-        name: userInfo.name || "",
-        expiresInMs: ONE_YEAR_MS,
-      });
+      // 2. Fetch user info 
+      const userRes = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", { 
+        headers: { Authorization: `Bearer ${tokenJson.access_token}` }, 
+      }); 
 
-      const cookieOptions = getSessionCookieOptions(req);
-      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+      const userInfo = await userRes.json(); 
+      
+      if (!userInfo.sub) { 
+        res.status(400).json({ error: "Missing Google user ID (sub)" }); 
+        return; 
+      } 
 
-      res.redirect(302, "/");
-    } catch (error) {
-      console.error("[OAuth] Callback failed", error);
+      // 3. Upsert user in DB 
+      await db.upsertUser({ 
+        openId: userInfo.sub, 
+        name: userInfo.name || null, 
+        email: userInfo.email ?? null, 
+        loginMethod: "google", 
+        lastSignedIn: new Date(), 
+      }); 
+
+      // 4. Create session token (your existing logic) 
+      const sessionToken = await db.createSessionToken(userInfo.sub, { 
+        name: userInfo.name || "", 
+        expiresInMs: ONE_YEAR_MS, 
+      }); 
+      
+      // 5. Set cookie 
+      const cookieOptions = getSessionCookieOptions(req); 
+      res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS }); 
+      
+      // 6. Redirect to homepage 
+      res.redirect(302, "/"); 
+    } catch (error) { 
+      console.error("[OAuth] Google callback failed", error); 
       res.status(500).json({ error: "OAuth callback failed" });
-    }
-  });
+    } 
+  }); 
 }

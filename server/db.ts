@@ -3,8 +3,22 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres"
 import { InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
+import jwt from "jsonwebtoken";
 
 let _db: ReturnType<typeof drizzle> | null = null;
+
+export function createSessionToken(openId: string, opts: { name: string; expiresInMs: number }) {
+  return jwt.sign(
+    {
+      sub: openId,
+      name: opts.name,
+    },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: Math.floor(opts.expiresInMs / 1000), // convert ms → seconds
+    }
+  );
+}
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {

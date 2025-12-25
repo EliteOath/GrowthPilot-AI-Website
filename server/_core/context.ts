@@ -1,6 +1,8 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
-import { sdk } from "./sdk";
+import jwt from "jsonwebtoken";
+import { COOKIE_NAME } from "@shared/const";
+import { getUserByOpenId } from "../db";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -11,18 +13,32 @@ export type TrpcContext = {
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
+  const { req, res } = opts;
+
   let user: User | null = null;
 
   try {
-    user = await sdk.authenticateRequest(opts.req);
+    const token = req.cookies?.[COOKIE_NAME];
+
+    if (token) {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+        sub: string;
+        name: string;
+      };
+
+      const dbUser = await getUserByOpenId(decoded.sub);
+
+      if (dbUser) {
+        user = dbUser;
+      }
+    }
   } catch (error) {
-    // Authentication is optional for public procedures.
-    user = null;
+    console.warn("[Auth] Invalid or missing session token");
   }
 
   return {
-    req: opts.req,
-    res: opts.res,
+    req,
+    res,
     user,
   };
 }
