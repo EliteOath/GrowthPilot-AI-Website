@@ -12,7 +12,7 @@ export async function listResources() {
   return db
     .select()
     .from(resources)
-    .where(eq(resources.isPublic, 1))
+    .where(eq(resources.isPublic, true))
     .orderBy(desc(resources.createdAt));
 }
 
