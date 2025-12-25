@@ -1,7 +1,6 @@
-// /api/index.ts
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import app from '../server/_core/app';
+import type { IncomingMessage, ServerResponse } from "http";
+import app from "../server/_core/app";
 
-export default function handler(req: VercelRequest, res: VercelResponse) {
+export default function handler(req: IncomingMessage, res: ServerResponse) {
   return app(req as any, res as any);
 }
