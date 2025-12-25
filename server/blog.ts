@@ -9,7 +9,7 @@ export async function listPublishedBlogPosts() {
   return db
     .select()
     .from(blogPosts)
-    .where(eq(blogPosts.isPublished, 1))
+    .where(eq(blogPosts.isPublished, true))
     .orderBy(desc(blogPosts.publishedAt));
 }
 

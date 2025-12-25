@@ -1,74 +1,82 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import {
+  pgTable,
+  serial,
+  varchar,
+  timestamp,
+  integer,
+  boolean,
+  text,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
-export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
-  id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
+/* ----------------------------- ENUMS ----------------------------- */
+
+export const userRoleEnum = pgEnum("role", ["user", "admin"]);
+export const invoiceStatusEnum = pgEnum("status", [
+  "pending",
+  "paid",
+  "overdue",
+  "cancelled",
+]);
+
+/* ----------------------------- USERS ----------------------------- */
+
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: userRoleEnum("role").default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-/**
- * Invoices table for tracking client billing
- */
-export const invoices = mysqlTable("invoices", {
-  id: int("id").autoincrement().primaryKey(),
-  userId: int("userId").notNull(),
+/* ----------------------------- INVOICES ----------------------------- */
+
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  userId: integer("userId").notNull(),
   invoiceNumber: varchar("invoiceNumber", { length: 64 }).notNull().unique(),
-  amount: int("amount").notNull(), // Amount in cents
-  status: mysqlEnum("status", ["pending", "paid", "overdue", "cancelled"]).default("pending").notNull(),
+  amount: integer("amount").notNull(), // cents
+  status: invoiceStatusEnum("status").default("pending").notNull(),
   dueDate: timestamp("dueDate").notNull(),
   paidDate: timestamp("paidDate"),
   description: text("description"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export type Invoice = typeof invoices.$inferSelect;
 export type InsertInvoice = typeof invoices.$inferInsert;
 
-/**
- * Resources table for downloadable content (guides, templates, etc.)
- */
-export const resources = mysqlTable("resources", {
-  id: int("id").autoincrement().primaryKey(),
+/* ----------------------------- RESOURCES ----------------------------- */
+
+export const resources = pgTable("resources", {
+  id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   category: varchar("category", { length: 100 }),
   fileUrl: text("fileUrl").notNull(),
   thumbnailUrl: text("thumbnailUrl"),
-  downloadCount: int("downloadCount").default(0).notNull(),
-  isPublic: int("isPublic", { unsigned: true }).default(1).notNull(), // 1 = public, 0 = requires auth
+  downloadCount: integer("downloadCount").default(0).notNull(),
+  isPublic: boolean("isPublic").default(true).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export type Resource = typeof resources.$inferSelect;
 export type InsertResource = typeof resources.$inferInsert;
 
-/**
- * Resource downloads tracking table
- */
-export const resourceDownloads = mysqlTable("resourceDownloads", {
-  id: int("id").autoincrement().primaryKey(),
-  resourceId: int("resourceId").notNull(),
+/* ----------------------------- RESOURCE DOWNLOADS ----------------------------- */
+
+export const resourceDownloads = pgTable("resourceDownloads", {
+  id: serial("id").primaryKey(),
+  resourceId: integer("resourceId").notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   name: varchar("name", { length: 255 }),
   company: varchar("company", { length: 255 }),
@@ -78,11 +86,10 @@ export const resourceDownloads = mysqlTable("resourceDownloads", {
 export type ResourceDownload = typeof resourceDownloads.$inferSelect;
 export type InsertResourceDownload = typeof resourceDownloads.$inferInsert;
 
-/**
- * Case studies table for detailed project showcases
- */
-export const caseStudies = mysqlTable("caseStudies", {
-  id: int("id").autoincrement().primaryKey(),
+/* ----------------------------- CASE STUDIES ----------------------------- */
+
+export const caseStudies = pgTable("caseStudies", {
+  id: serial("id").primaryKey(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   title: varchar("title", { length: 255 }).notNull(),
   client: varchar("client", { length: 255 }).notNull(),
@@ -95,20 +102,19 @@ export const caseStudies = mysqlTable("caseStudies", {
   testimonialAuthor: varchar("testimonialAuthor", { length: 255 }),
   testimonialRole: varchar("testimonialRole", { length: 255 }),
   imageUrl: text("imageUrl"),
-  metrics: text("metrics"), // JSON string with key metrics
-  isPublished: int("isPublished", { unsigned: true }).default(0).notNull(),
+  metrics: text("metrics"),
+  isPublished: boolean("isPublished").default(false).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export type CaseStudy = typeof caseStudies.$inferSelect;
 export type InsertCaseStudy = typeof caseStudies.$inferInsert;
 
-/**
- * Blog posts table for content management
- */
-export const blogPosts = mysqlTable("blogPosts", {
-  id: int("id").autoincrement().primaryKey(),
+/* ----------------------------- BLOG POSTS ----------------------------- */
+
+export const blogPosts = pgTable("blogPosts", {
+  id: serial("id").primaryKey(),
   slug: varchar("slug", { length: 255 }).notNull().unique(),
   title: varchar("title", { length: 255 }).notNull(),
   excerpt: text("excerpt"),
@@ -116,17 +122,17 @@ export const blogPosts = mysqlTable("blogPosts", {
   author: varchar("author", { length: 255 }),
   authorRole: varchar("authorRole", { length: 255 }),
   category: varchar("category", { length: 100 }),
-  tags: text("tags"), // JSON array of tags
+  tags: text("tags"),
   featuredImage: text("featuredImage"),
   metaTitle: varchar("metaTitle", { length: 255 }),
   metaDescription: text("metaDescription"),
   metaKeywords: text("metaKeywords"),
-  isPublished: int("isPublished", { unsigned: true }).default(0).notNull(),
+  isPublished: boolean("isPublished").default(false).notNull(),
   publishedAt: timestamp("publishedAt"),
-  readTime: int("readTime"), // Estimated reading time in minutes
-  viewCount: int("viewCount").default(0).notNull(),
+  readTime: integer("readTime"),
+  viewCount: integer("viewCount").default(0).notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
 });
 
 export type BlogPost = typeof blogPosts.$inferSelect;
