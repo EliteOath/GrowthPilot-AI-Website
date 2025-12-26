@@ -12,16 +12,28 @@ import { z } from "zod";
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
   system: systemRouter,
-  auth: router({
-    me: publicProcedure.query(opts => opts.ctx.user),
+  session: router({
+    me: publicProcedure.query(({ ctx }) => {
+      if (!ctx.user) { 
+        return { authenticated: false, user: null }; 
+      } 
+      return { 
+        authenticated: true, 
+        user: ctx.user, 
+      }; 
+    }),
+
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req as any);
       (ctx.res as any).clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
-      return {
-        success: true,
-      } as const;
+      return { success: true };
     }),
   }),
+
+  health: publicProcedure.query(() => ({
+     status: "ok",
+     timestamp: Date.now(),
+    })),
 
   billing: router({
     getMyInvoices: protectedProcedure.query(async ({ ctx }) => {
@@ -30,14 +42,13 @@ export const appRouter = router({
     payInvoice: protectedProcedure
       .input(z.object({ invoiceId: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        const originHeader = (ctx.req as any).headers?.origin as string | undefined;
-        const origin = originHeader || "http://localhost:3000";
+        const origin = (ctx.req as any).headers?.origin || "http://localhost:3000";
 
         const checkoutUrl = await createInvoicePaymentSession(
           input.invoiceId,
           ctx.user.id,
-          (ctx.user.email as string) || "",
-          (ctx.user.name as string) || "",
+          ctx.user.email || "",
+          ctx.user.name || "",
           origin
         );
         return { checkoutUrl };
@@ -45,9 +56,8 @@ export const appRouter = router({
   }),
 
   resources: router({
-    list: publicProcedure.query(async () => {
-      return listResources();
-    }),
+    list: publicProcedure.query(() => listResources()),
+    
     download: publicProcedure
       .input(
         z.object({
@@ -82,22 +92,20 @@ export const appRouter = router({
       }),
   }),
 
+
   blog: router({
-    listPublished: publicProcedure.query(async () => {
-      return listPublishedBlogPosts();
-    }),
-    listAll: protectedProcedure.query(async () => {
-      return listAllBlogPosts();
-    }),
+    listPublished: publicProcedure.query(() => listPublishedBlogPosts()),
+    
+    listAll: protectedProcedure.query(() => listAllBlogPosts()),
+    
     getBySlug: publicProcedure
       .input(z.object({ slug: z.string() }))
       .query(async ({ input }) => {
         const post = await getBlogPostBySlug(input.slug);
-        if (post) {
-          await incrementViewCount(input.slug);
-        }
+        if (post) await incrementViewCount(input.slug);
         return post;
       }),
+
     create: protectedProcedure
       .input(
         z.object({
@@ -118,9 +126,8 @@ export const appRouter = router({
           readTime: z.number().optional(),
         })
       )
-      .mutation(async ({ input }) => {
-        return createBlogPost(input);
-      }),
+      .mutation(({ input }) => createBlogPost(input)),
+      
     update: protectedProcedure
       .input(
         z.object({
@@ -142,15 +149,13 @@ export const appRouter = router({
           readTime: z.number().optional(),
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(({ input }) => {
         const { id, ...data } = input;
         return updateBlogPost(id, data);
       }),
     delete: protectedProcedure
       .input(z.object({ id: z.number() }))
-      .mutation(async ({ input }) => {
-        return deleteBlogPost(input.id);
-      }),
+      .mutation(({ input }) => deleteBlogPost(input.id)),
   }),
 });
 

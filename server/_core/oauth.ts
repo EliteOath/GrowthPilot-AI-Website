@@ -1,18 +1,12 @@
 import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
-import type { Express } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 
-function getQueryParam(req: any, key: string): string | undefined {
-  const value = req.query?.[key];
-  return typeof value === "string" ? value : undefined;
-}
-
-export function registerOAuthRoutes(app: Express) {
+export function registerOAuthRoutes(app: any) {
   app.get("/api/oauth/google/callback", async (req: any, res: any) => {
-    const code = getQueryParam(req, "code");
+    const code = req.query?.code;
 
-    if (!code) {
+    if (!code || typeof code !== "string") {
       res.status(400).json({ error: "Missing ?code=" });
       return;
     }
