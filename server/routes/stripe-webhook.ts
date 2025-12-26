@@ -1,4 +1,4 @@
-import { Router, type Request, type Response } from "express";
+import { Router } from "express";
 import Stripe from "stripe";
 import { handleWebhookEvent } from "../stripe";
 import { notifyInvoicePayment } from "../notifications";
@@ -8,7 +8,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-12-15.clover",
 });
 
-router.post("/api/stripe/webhook", async (req: Request, res: Response) => {
+router.post("/api/stripe/webhook", async (req: any, res: any) => {
   const sig = req.headers["stripe-signature"];
 
   if (!sig) {
@@ -41,7 +41,8 @@ router.post("/api/stripe/webhook", async (req: Request, res: Response) => {
         await notifyInvoicePayment({
           invoiceNumber: session.metadata.invoice_id,
           amount: session.amount_total / 100,
-          customerEmail: session.metadata.customer_email || session.customer_email,
+          customerEmail: 
+            session.metadata.customer_email || session.customer_email,
           customerName: session.metadata.customer_name,
         });
       }
