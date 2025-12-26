@@ -5,14 +5,12 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import cookieParser from "cookie-parser";
+import stripeWebhookRouter from "../routes/stripe-webhook";
 
 const app = express();
 
 // Stripe webhook MUST be registered before JSON middleware
-app.use("/api/stripe/webhook", express.raw({ type: "application/json" }));
-import("../routes/stripe-webhook").then(router => {
-  app.use(router.default);
-});
+app.use("api/stripe/webhook", stripeWebhookRouter);
 
 app.use(cookieParser());
 
