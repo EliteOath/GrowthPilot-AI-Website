@@ -13,7 +13,10 @@
 
     //This overrides the root and removes vite/client
     "typeRoots": ["./types", "./node_modules/@types"],
-    "types": []
+    "types": [],
+    "paths": {
+      "../dist-backend/api/server/_core/app.js": ["./types/app"]
+    }
   },
   "include": ["api-src/trpc.ts"],
   "exclude": []

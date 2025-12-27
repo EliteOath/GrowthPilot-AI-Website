@@ -1,15 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist-backend",
+    "rootDir": "api/server",
+    "outDir": "dist-backend/api/server",
     "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "node",
     "noEmit": false,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "allowImportingTsExtensions": false
+    "skipLibCheck": true
   },
   "include": ["api/server/**/*"],
-  "exclude": ["**/*.test.ts", "vite.config.ts", "api/server/_core/vite.ts"]
+  "exclude": ["**/*.test.ts"]
 }
