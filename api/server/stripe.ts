@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { eq } from "drizzle-orm";
-import { invoices } from "../drizzle/schema";
+import { invoices } from "../../drizzle/schema";
 import { getDb } from "./db";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {

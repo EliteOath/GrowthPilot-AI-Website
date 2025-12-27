@@ -1,5 +1,5 @@
 import { eq, desc, and, like } from "drizzle-orm";
-import { blogPosts, type InsertBlogPost } from "../drizzle/schema";
+import { blogPosts, type InsertBlogPost } from "../../drizzle/schema";
 import { getDb } from "./db";
 
 export async function listPublishedBlogPosts() {

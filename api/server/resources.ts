@@ -1,5 +1,5 @@
 import { eq, desc } from "drizzle-orm";
-import { resources, resourceDownloads, InsertResourceDownload } from "../drizzle/schema";
+import { resources, resourceDownloads, InsertResourceDownload } from "../../drizzle/schema";
 import { getDb } from "./db";
 
 export async function listResources() {
