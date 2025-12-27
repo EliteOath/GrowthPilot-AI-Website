@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { COOKIE_NAME } from "@shared/const";
-import { getUserByOpenId } from "../db";
+import { COOKIE_NAME } from "../../shared/const.js";
+import { getUserByOpenId } from "../db.js";
 export async function createContext(opts) {
     const { req, res } = opts;
     let user = null;

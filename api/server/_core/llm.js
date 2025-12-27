@@ -1,4 +1,4 @@
-import { ENV } from "./env";
+import { ENV } from "./env.js";
 const ensureArray = (value) => (Array.isArray(value) ? value : [value]);
 const normalizeContentPart = (part) => {
     if (typeof part === "string") {
@@ -138,7 +138,7 @@ export async function invokeLLM(params) {
     });
     if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`LLM invoke failed: ${response.status} ${response.statusText} – ${errorText}`);
+        throw new Error(`LLM invoke failed: ${response.status} ${response.statusText} â€“ ${errorText}`);
     }
     return (await response.json());
 }

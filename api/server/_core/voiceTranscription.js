@@ -25,7 +25,7 @@
  * });
  * ```
  */
-import { ENV } from "./env";
+import { ENV } from "./env.js";
 /**
  * Transcribe audio to text using the internal Speech-to-Text service
  *
@@ -183,7 +183,7 @@ function getLanguageName(langCode) {
  *
  * ```ts
  * // In server/routers.ts
- * import { transcribeAudio } from "./_core/voiceTranscription";
+ * import { transcribeAudio } from "./_core/voiceTranscription.js";
  *
  * export const voiceRouter = router({
  *   transcribe: protectedProcedure

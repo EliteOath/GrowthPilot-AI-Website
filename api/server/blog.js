@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
-import { blogPosts } from "../../drizzle/schema";
-import { getDb } from "./db";
+import { blogPosts } from "../drizzle/schema.js";
+import { getDb } from "./db.js";
 export async function listPublishedBlogPosts() {
     const db = await getDb();
     if (!db)

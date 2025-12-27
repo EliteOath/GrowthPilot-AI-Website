@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { eq } from "drizzle-orm";
-import { invoices } from "../../drizzle/schema";
-import { getDb } from "./db";
+import { invoices } from "../drizzle/schema.js";
+import { getDb } from "./db.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
     apiVersion: "2025-12-15.clover",
 });

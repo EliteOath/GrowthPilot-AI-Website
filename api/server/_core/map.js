@@ -6,7 +6,7 @@
  *
  * See API examples below the type definitions for usage patterns.
  */
-import { ENV } from "./env";
+import { ENV } from "./env.js";
 function getMapsConfig() {
     const baseUrl = ENV.forgeApiUrl;
     const apiKey = ENV.forgeApiKey;
