@@ -1,6 +1,13 @@
 {
   "version": 2,
+  "functions": {
+    "api/handler.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/trpc.js" }
+    { "src": "/api/stripe-webhook", "dest": "/api/handler.js" },
+    { "src": "/api/trpc(?:/.*)?", "dest": "/api/handler.js" },
+    { "src": "/api/(.*)", "dest": "/api/handler.js" }
   ]
 }
