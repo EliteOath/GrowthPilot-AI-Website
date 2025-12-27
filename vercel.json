@@ -1,12 +1,6 @@
 {
   "version": 2,
-  "functions": {
-      "api/trpc.ts": {
-        "runtime": "nodejs20.x",
-        "includeFiles": "dist-server/**/*"
-      }
-  },
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/trpc.ts" }
+    { "src": "/api/(.*)", "dest": "/api/trpc.js" }
   ]
 }
