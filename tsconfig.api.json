@@ -2,6 +2,8 @@
   "extends": "./tsconfig.json",
   "files": [],
   "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
     "outDir": "api",
     "module": "ESNext",
     "target": "ES2020",
@@ -15,9 +17,10 @@
     "typeRoots": ["./types", "./node_modules/@types"],
     "types": [],
     "paths": {
-      "../dist-backend/api/server/_core/app.js": ["./types/app"]
+      "../dist-backend/api/server/_core/app.js": ["./types/app"],
+      "@shared/*": ["shared/*"]
     }
   },
-  "include": ["api-src/trpc.ts"],
+  "include": ["api-src/trpc.ts", "api-src/**/*", "shared/**/*"],
   "exclude": []
 }
