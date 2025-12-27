@@ -5,7 +5,10 @@
     "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "node",
-    "noEmit": false
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": false
   },
-  "include": ["api/trpc.ts"]
+  "include": ["api/trpc.ts"],
+  "exclude": ["vite.config.ts", "api/server/_core/vite.ts"]
 }

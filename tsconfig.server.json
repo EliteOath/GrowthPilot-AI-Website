@@ -5,7 +5,11 @@
     "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "node",
-    "noEmit": false
+    "noEmit": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": false
   },
-  "include": ["api/server/**/*"]
+  "include": ["api/server/**/*"],
+  "exclude": ["**/*.test.ts", "vite.config.ts", "api/server/_core/vite.ts"]
 }
