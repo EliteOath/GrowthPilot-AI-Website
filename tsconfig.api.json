@@ -1,14 +1,20 @@
 {
   "extends": "./tsconfig.json",
+  "files": [],
   "compilerOptions": {
     "outDir": "api",
     "module": "ESNext",
     "target": "ES2020",
     "moduleResolution": "node",
+    "noEmit": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+
+    //This overrides the root and removes vite/client
+    "typeRoots": ["./types", "./node_modules/@types"],
+    "types": []
   },
-  "include": ["api/trpc.ts"],
-  "exclude": ["vite.config.ts", "api/server/_core/vite.ts"]
+  "include": ["api-src/trpc.ts"],
+  "exclude": []
 }
