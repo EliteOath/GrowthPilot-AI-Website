@@ -1,4 +1,4 @@
-import { getDb } from "./db";
+﻿import { getDb } from "./db.js";
 
 /**
  * Send notification using the built-in notification system

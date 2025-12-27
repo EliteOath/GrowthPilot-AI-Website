@@ -1,6 +1,6 @@
-import { eq, desc, and, like } from "drizzle-orm";
-import { blogPosts, type InsertBlogPost } from "../../drizzle/schema";
-import { getDb } from "./db";
+﻿import { eq, desc, and, like } from "drizzle-orm";
+import { blogPosts, type InsertBlogPost } from "../drizzle/schema.js";
+import { getDb } from "./db.js";
 
 export async function listPublishedBlogPosts() {
   const db = await getDb();

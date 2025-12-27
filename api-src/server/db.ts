@@ -1,8 +1,8 @@
-import { eq } from "drizzle-orm";
+﻿import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres"
-import { InsertUser, users } from "../../drizzle/schema";
-import { ENV } from './_core/env';
+import { InsertUser, users } from "../drizzle/schema.js";
+import { ENV } from './_core/env.js';
 import jwt from "jsonwebtoken";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -15,7 +15,7 @@ export function createSessionToken(openId: string, opts: { name: string; expires
     },
     process.env.JWT_SECRET!,
     {
-      expiresIn: Math.floor(opts.expiresInMs / 1000), // convert ms → seconds
+      expiresIn: Math.floor(opts.expiresInMs / 1000), // convert ms â†’ seconds
     }
   );
 }

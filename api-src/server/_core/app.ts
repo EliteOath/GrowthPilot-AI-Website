@@ -1,10 +1,10 @@
-import express from "express";
+﻿import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
-import { appRouter } from "../routers";
-import { createContext } from "./context";
+import { registerOAuthRoutes } from "./oauth.js";
+import { appRouter } from "../routers.js";
+import { createContext } from "./context.js";
 import cookieParser from "cookie-parser";
-import stripeWebhookRouter from "../routes/stripe-webhook";
+import stripeWebhookRouter from "../routes/stripe-webhook.js";
 
 const app = express();
 
@@ -29,7 +29,7 @@ app.use(
   })
 );
 
-// Vite or static files — skip this for Vercel
+// Vite or static files â€” skip this for Vercel
 // Vercel handles static serving separately
 
 export default app;

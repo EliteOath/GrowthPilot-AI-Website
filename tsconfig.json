@@ -13,13 +13,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "bundler",
     "baseUrl": ".",
     "typeRoots": ["./types", "./node_modules/@types"],
-    "types": ["node"],
-    "paths": {
-      "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
-    }
+    "types": ["node"]
   }
 }

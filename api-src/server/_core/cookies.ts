@@ -1,4 +1,4 @@
-type SessionCookieOptions = {
+﻿type SessionCookieOptions = {
   httpOnly: boolean;
   path: string;
   sameSite: "lax" | "strict" | "none";

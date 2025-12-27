@@ -1,6 +1,6 @@
-import { eq, desc } from "drizzle-orm";
-import { resources, resourceDownloads, InsertResourceDownload } from "../../drizzle/schema";
-import { getDb } from "./db";
+﻿import { eq, desc } from "drizzle-orm";
+import { resources, resourceDownloads, InsertResourceDownload } from "../drizzle/schema.js";
+import { getDb } from "./db.js";
 
 export async function listResources() {
   const db = await getDb();

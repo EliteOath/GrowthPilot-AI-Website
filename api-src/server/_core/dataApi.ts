@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Quick example (matches curl usage):
  *   await callDataApi("Youtube/search", {
  *     query: { gl: "US", hl: "en", q: "manus" },
  *   })
  */
-import { ENV } from "./env";
+import { ENV } from "./env.js";
 
 export type DataApiCallOptions = {
   query?: Record<string, unknown>;

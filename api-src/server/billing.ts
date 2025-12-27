@@ -1,6 +1,6 @@
-import { eq, desc } from "drizzle-orm";
-import { invoices } from "../../drizzle/schema";
-import { getDb } from "./db";
+﻿import { eq, desc } from "drizzle-orm";
+import { invoices } from "../drizzle/schema.js";
+import { getDb } from "./db.js";
 
 export async function getUserInvoices(userId: number) {
   const db = await getDb();

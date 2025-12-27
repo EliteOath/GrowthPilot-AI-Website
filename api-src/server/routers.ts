@@ -1,12 +1,12 @@
-import { COOKIE_NAME } from "@shared/const";
-import { getSessionCookieOptions } from "./_core/cookies";
-import { systemRouter } from "./_core/systemRouter";
-import { protectedProcedure, publicProcedure, router } from "./_core/trpc";
-import { getUserInvoices } from "./billing";
-import { createInvoicePaymentSession } from "./stripe";
-import { listResources, getResourceById, recordResourceDownload } from "./resources";
-import { notifyResourceDownload } from "./notifications";
-import { listPublishedBlogPosts, listAllBlogPosts, getBlogPostBySlug, createBlogPost, updateBlogPost, deleteBlogPost, incrementViewCount } from "./blog";
+﻿import { COOKIE_NAME } from "../shared/const.js";
+import { getSessionCookieOptions } from "./_core/cookies.js";
+import { systemRouter } from "./_core/systemRouter.js";
+import { protectedProcedure, publicProcedure, router } from "./_core/trpc.js";
+import { getUserInvoices } from "./billing.js";
+import { createInvoicePaymentSession } from "./stripe.js";
+import { listResources, getResourceById, recordResourceDownload } from "./resources.js";
+import { notifyResourceDownload } from "./notifications.js";
+import { listPublishedBlogPosts, listAllBlogPosts, getBlogPostBySlug, createBlogPost, updateBlogPost, deleteBlogPost, incrementViewCount } from "./blog.js";
 import { z } from "zod";
 
 export const appRouter = router({

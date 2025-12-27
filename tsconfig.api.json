@@ -2,13 +2,16 @@
   "extends": "./tsconfig.json",
   "files": [],
   "compilerOptions": {
-    "rootDir": ".",
-    "baseUrl": ".",
-    "outDir": "api",
-    "module": "ESNext",
-    "target": "ES2020",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
     "noEmit": false,
+    "rootDir": "api-src",
+    "outDir": "api",
+    "baseUrl": ".",
+    
+    "target": "ES2020",
+   
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": false,
@@ -17,10 +20,11 @@
     "typeRoots": ["./types", "./node_modules/@types"],
     "types": [],
     "paths": {
-      "../dist-backend/api/server/_core/app.js": ["./types/app"],
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["api-src/shared/*"],
+      "@drizzle/*": ["api-src/drizzle/*"],
+      "@/*": ["./__ignore__/*"]
     }
   },
-  "include": ["api-src/trpc.ts", "api-src/**/*", "shared/**/*"],
+  "include": ["api-src/**/*"],
   "exclude": []
 }
